@@ -4,10 +4,23 @@ var tasksToDoEl = document.querySelector("#tasks-to-do");
 var createTaskHandler = function (event) {
     // console.log(event);
     event.preventDefault(); // prevents the browser from refreshing after submitting the form
+    // creates the taskNameInput variable and stores the value of the <input> element
+    var taskNameInput = document.querySelector("input[name='task-name']").value;
+    // creates the taskTypeInput variable and stores the value of the <select> element
+    var taskTypeInput = document.querySelector("select[name='task-type']").value;
+
     var listItemEl = document.createElement("li"); // creates the <li> html element
     listItemEl.className = "task-item"; // assigns the class task-item to the <li> element
-    listItemEl.textContent = "This is a new task.";
-    tasksToDoEl.appendChild(listItemEl); // adds the li element to the #tasks-to-do <ul> 
+
+    // create <div> to hold task info and add to list item
+    var taskInfoEl = document.createElement("div"); 
+    taskInfoEl.className = "task-info"; // assigns the class task-info to the <div> element
+    // add HTML content to <div> // the innerHTML property accepts HTML tags while the textContent would convert it to text
+    taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskNameInput + "</h3><span class='task-type'>" + taskTypeInput + "</span>";
+    
+    listItemEl.appendChild(taskInfoEl); // adds the <div> element defined above to the <li> element
+
+    tasksToDoEl.appendChild(listItemEl); // adds the <li> element to the #tasks-to-do <ul> 
 }
 
 formEl.addEventListener("submit", createTaskHandler);
