@@ -62,11 +62,32 @@ var createTaskEl = function(taskDataObj) {
 
     tasksToDoEl.appendChild(listItemEl); // adds the <li> element to the #tasks-to-do <ul>
 
+    // Recreates the loaded tasks in their appropriate columns after loading from localStorage
+    switch (taskDataObj.status) {
+        case "to do":
+            taskActionsEl.querySelector("select[name='status-change']").selectedIndex = 0;
+            tasksToDoEl.append(listItemEl);
+            break;
+        case "in progress":
+            taskActionsEl.querySelector("select[name='status-change']").selectedIndex = 1;
+            tasksInProgressEl.append(listItemEl);
+            break;
+        case "completed":
+            taskActionsEl.querySelector("select[name='status-change']").selectedIndex = 2;
+            tasksCompleteEl.append(listItemEl);
+            break;
+        default:
+            console.log("Something went wrong!");
+    }
+
     // creates an id property and adds to the taskDataObj
     taskDataObj.id = taskIdCounter;
     // add the taskDataObj to the tasks array (defined on the top)
     tasks.push(taskDataObj);
-    
+
+    // save array to the local storage
+    saveTasks();
+
     // increase task counter for next unique id
     taskIdCounter ++;
 };
@@ -153,6 +174,9 @@ var deleteTask = function(taskId) {
         }
     };
 
+    // save array to the local storage
+    saveTasks();
+
     // reassign tasks array to be the same as updatedTaskArr
     tasks = updatedTaskArr;
 };
@@ -193,6 +217,9 @@ var completeEditTask = function(taskName, taskType, taskId) {
         }
     };
 
+    // save array to the local storage
+    saveTasks();
+
     alert("Task Updated!");
 
     formEl.removeAttribute("data-task-id");
@@ -226,11 +253,37 @@ var taskStatusChangeHandler = function(event) {
             tasks[i].status = statusValue;
         }
     };
+
+    // save array to the local storage
+    saveTasks();
 }
 
+var saveTasks = function() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));    
+}
 
-formEl.addEventListener("submit", taskFormHandler);
+var loadTasks = function(){
+    // get from local storage 
+    var savedTasks = localStorage.getItem("tasks");
+    
+    if (!savedTasks) {
+        return false;
+    }
+    
+    console.log("Loaded tasks successfully");
+    // convert string back to array 
+    savedTasks = JSON.parse(savedTasks);
+    
+    // iterate through the array to create tasks elements on the page
+    for (i=0; i < savedTasks.length; i++){
+        createTaskEl(savedTasks[i]);
+        ;
+    }
+}
+
 // submit event is also called onsubmit in certain documentation
+formEl.addEventListener("submit", taskFormHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
 
+loadTasks();
